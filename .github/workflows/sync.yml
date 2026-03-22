@@ -1,25 +1,23 @@
 name: Sync OpenClaw to Your GHCR
+
 on:
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # 每天凌晨自动同步一次
+    - cron: '0 0 * * *'
+
 jobs:
   sync-image:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull official OpenClaw image
-        run: docker pull ghcr.io/openclaw/openclaw:latest
-      - name: Tag image to your GHCR
-        run: docker tag ghcr.io/openclaw/openclaw:latest ghcr.io/${{ github.actor }}/openclaw:latest
-      - name: Push to your GHCR
-        run: docker push ghcr.io/${{ github.actor }}/openclaw:latest
+
+      - name: Pull & Push OpenClaw
+        run: |
+          docker pull ghcr.io/openclaw/openclaw:latest
+          docker tag ghcr.io/openclaw/openclaw:latest ghcr.io/csr-boory/openclaw:latest
+          docker push ghcr.io/csr-boory/openclaw:latest
