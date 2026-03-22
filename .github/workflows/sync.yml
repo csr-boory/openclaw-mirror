@@ -19,10 +19,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull official OpenClaw WEB UI
-        run: docker pull docker.io/lewangdev/openclaw:latest
+        run: docker pull ghcr.io/openclaw/web:latest
 
       - name: Tag to your private GHCR
-        run: docker tag docker.io/lewangdev/openclaw:latest ghcr.io/csr-boory/openclaw:latest
+        run: docker tag ghcr.io/openclaw/web:latest ghcr.io/csr-boory/openclaw:latest
 
       - name: Push and set public
         run: |
