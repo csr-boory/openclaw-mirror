@@ -17,10 +17,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull 带网页UI的完整镜像
-        run: docker pull samuel1111/openclaw:latest
+        run: docker pull ghcr.io/andrewstech/openclaw-webui:latest
 
       - name: 重命名到你的私人仓库
-        run: docker tag samuel1111/openclaw:latest ghcr.io/csr-boory/openclaw-web:latest
+        run: docker tag ghcr.io/andrewstech/openclaw-webui:latest ghcr.io/csr-boory/openclaw-web:latest
 
       - name: 推送到你的私人仓库
         run: docker push ghcr.io/csr-boory/openclaw-web:latest
