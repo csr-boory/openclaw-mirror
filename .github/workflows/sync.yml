@@ -8,6 +8,9 @@ on:
 jobs:
   sync-image:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
     steps:
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -16,8 +19,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull & Push OpenClaw
+      - name: Pull official OpenClaw image
+        run: docker pull ghcr.io/openclaw/openclaw:latest
+
+      - name: Tag image to your GHCR
+        run: docker tag ghcr.io/openclaw/openclaw:latest ghcr.io/csr-boory/openclaw:latest
+
+      - name: Push image to GHCR (auto-create public package)
         run: |
-          docker pull ghcr.io/openclaw/openclaw:latest
-          docker tag ghcr.io/openclaw/openclaw:latest ghcr.io/csr-boory/openclaw:latest
           docker push ghcr.io/csr-boory/openclaw:latest
+          # 自动标记为公开包，绕过创建步骤
+          curl -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/user/packages/container/openclaw \
+            -d '{"visibility":"public"}'
