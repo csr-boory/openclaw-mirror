@@ -1,4 +1,4 @@
-name: Sync OpenClaw WEB UI 网页版
+name: 同步 OpenClaw 完整增强版（带网页+IM机器人）
 on:
   workflow_dispatch:
 
@@ -9,26 +9,25 @@ jobs:
       packages: write
       contents: read
     steps:
-      - name: Login to GHCR
+      - name: 登录 GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull 带网页UI的完整镜像
-        run: docker pull ghcr.io/andrewstech/openclaw-webui:latest
+      - name: 拉取原版增强镜像
+        run: docker pull justlikemaki/openclaw-docker-cn-im:latest
 
-      - name: 重命名到你的私人仓库
-        run: docker tag ghcr.io/andrewstech/openclaw-webui:latest ghcr.io/csr-boory/openclaw-web:latest
+      - name: 推送到你的第二个私有仓库
+        run: |
+          docker tag justlikemaki/openclaw-docker-cn-im:latest ghcr.io/csr-boory/openclaw-im:latest
+          docker push ghcr.io/csr-boory/openclaw-im:latest
 
-      - name: 推送到你的私人仓库
-        run: docker push ghcr.io/csr-boory/openclaw-web:latest
-
-      - name: 设置为公开
+      - name: 设置为公开（可拉取）
         run: |
           curl -X PATCH \
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -H "Accept: application/vnd.github+json" \
-          https://api.github.com/user/packages/container/openclaw-web \
+          https://api.github.com/user/packages/container/openclaw-im \
           -d '{"visibility":"public"}'
