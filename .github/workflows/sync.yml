@@ -1,12 +1,11 @@
-name: Sync OpenClaw to Your GHCR
-
+name: Sync OpenClaw WEB UI to GHCR
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
-  sync-image:
+  sync:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -19,16 +18,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull official OpenClaw image
-        run: docker pull ghcr.io/openclaw/openclaw:latest
+      - name: Pull official OpenClaw WEB UI
+        run: docker pull docker.io/lewangdev/openclaw:latest
 
-      - name: Tag image to your GHCR
-        run: docker tag ghcr.io/openclaw/openclaw:latest ghcr.io/csr-boory/openclaw:latest
+      - name: Tag to your private GHCR
+        run: docker tag docker.io/lewangdev/openclaw:latest ghcr.io/csr-boory/openclaw:latest
 
-      - name: Push image to GHCR (auto-create public package)
+      - name: Push and set public
         run: |
           docker push ghcr.io/csr-boory/openclaw:latest
-          # 自动标记为公开包，绕过创建步骤
           curl -X PATCH \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
