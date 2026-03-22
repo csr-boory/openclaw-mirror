@@ -1,11 +1,11 @@
-name: Sync OpenClaw WEB UI to GHCR
+name: Sync OpenClaw to Your GHCR
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
-  sync:
+  sync-image:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -18,13 +18,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull official OpenClaw WEB UI
-        run: docker pull ghcr.io/openclaw/web:latest
+      - name: Pull official OpenClaw image
+        run: docker pull ghcr.io/openclaw/openclaw:latest
 
-      - name: Tag to your private GHCR
-        run: docker tag ghcr.io/openclaw/web:latest ghcr.io/csr-boory/openclaw:latest
+      - name: Tag image to your GHCR
+        run: docker tag ghcr.io/openclaw/openclaw:latest ghcr.io/csr-boory/openclaw:latest
 
-      - name: Push and set public
+      - name: Push image to GHCR (auto-create public package)
         run: |
           docker push ghcr.io/csr-boory/openclaw:latest
           curl -X PATCH \
