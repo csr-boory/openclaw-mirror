@@ -1,4 +1,4 @@
-name: Sync Ollama & WebUI
+name: Sync Ollama & WebUI to GHCR
 
 on:
   workflow_dispatch:
@@ -14,12 +14,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 同步 Ollama
-      - run: docker pull ghcr.io/ollama/ollama:latest
-      - run: docker tag ghcr.io/ollama/ollama:latest ghcr.io/${{ github.repository_owner }}/ollama:latest
+      # 同步 Ollama（正确官方地址：Docker Hub）
+      - run: docker pull ollama/ollama:latest
+      - run: docker tag ollama/ollama:latest ghcr.io/${{ github.repository_owner }}/ollama:latest
       - run: docker push ghcr.io/${{ github.repository_owner }}/ollama:latest
 
-      # 同步 Open WebUI
+      # 同步 Open WebUI（正确 GHCR 地址）
       - run: docker pull ghcr.io/open-webui/open-webui:main
       - run: docker tag ghcr.io/open-webui/open-webui:main ghcr.io/${{ github.repository_owner }}/open-webui:main
       - run: docker push ghcr.io/${{ github.repository_owner }}/open-webui:main
