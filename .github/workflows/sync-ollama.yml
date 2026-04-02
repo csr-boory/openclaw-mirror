@@ -1,32 +1,24 @@
-name: Sync Ollama to GHCR
+name: Sync Ollama & WebUI from China Mirror
 
 on:
-  schedule:
-    - cron: '0 0 * * 0' # 每周日自动同步一次
-  workflow_dispatch: # 手动触发
+  workflow_dispatch:
 
 jobs:
-  sync:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: 配置 Docker 国内加速
-        run: |
-          echo '{ "registry-mirrors": ["https://docker.m.daocloud.io"] }' | sudo tee /etc/docker/daemon.json
-          sudo systemctl daemon-reload
-          sudo systemctl restart docker
-
-      - name: 登录 GHCR
-        uses: docker/login-action@v3
+      - name: Sync Ollama
+        uses: akhilmhdh/containers-actions-copy@v0.0.2
         with:
-          registry: ghcr.io
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          source_image: docker.m.daocloud.io/ollama/ollama:latest
+          destination_image: ghcr.io/${{ github.repository_owner }}/ollama:latest
+          DOCKERHUB_USERNAME: ${{ github.repository_owner }}
+          DOCKERHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 同步 Ollama 镜像
-        uses: docker/build-push-action@v5
+      - name: Sync Open WebUI
+        uses: akhilmhdh/containers-actions-copy@v0.0.2
         with:
-          pull: true
-          push: true
-          tags: ghcr.io/${{ secrets.GHCR_USERNAME }}/ollama:latest
-          pull-push: true
-          source: docker.io/ollama/ollama:latest
+          source_image: docker.m.daocloud.io/open-webui/open-webui:main
+          destination_image: ghcr.io/${{ github.repository_owner }}/open-webui:main
+          DOCKERHUB_USERNAME: ${{ github.repository_owner }}
+          DOCKERHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
