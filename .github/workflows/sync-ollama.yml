@@ -1,4 +1,4 @@
-name: 同步国内 Ollama & WebUI
+name: Sync Ollama & WebUI
 
 on:
   workflow_dispatch:
@@ -14,20 +14,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 拉取国内 Ollama
-        run: docker pull docker.m.daocloud.io/ollama/ollama:latest
+      # 同步 Ollama
+      - run: docker pull ghcr.io/ollama/ollama:latest
+      - run: docker tag ghcr.io/ollama/ollama:latest ghcr.io/${{ github.repository_owner }}/ollama:latest
+      - run: docker push ghcr.io/${{ github.repository_owner }}/ollama:latest
 
-      - name: 打标签
-        run: docker tag docker.m.daocloud.io/ollama/ollama:latest ghcr.io/${{ github.repository_owner }}/ollama:latest
-
-      - name: 推送到私仓
-        run: docker push ghcr.io/${{ github.repository_owner }}/ollama:latest
-
-      - name: 拉取国内 Open WebUI
-        run: docker pull docker.m.daocloud.io/open-webui/open-webui:main
-
-      - name: 打标签
-        run: docker tag docker.m.daocloud.io/open-webui/open-webui:main ghcr.io/${{ github.repository_owner }}/open-webui:main
-
-      - name: 推送到私仓
-        run: docker push ghcr.io/${{ github.repository_owner }}/open-webui:main
+      # 同步 Open WebUI
+      - run: docker pull ghcr.io/open-webui/open-webui:main
+      - run: docker tag ghcr.io/open-webui/open-webui:main ghcr.io/${{ github.repository_owner }}/open-webui:main
+      - run: docker push ghcr.io/${{ github.repository_owner }}/open-webui:main
