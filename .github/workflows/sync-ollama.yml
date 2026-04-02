@@ -1,28 +1,33 @@
-name: 同步国内镜像到私仓
+name: 同步国内 Ollama & WebUI
 
 on:
-  workflow_dispatch: # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: 同步 Ollama 镜像
-        uses: docker/build-push-action@v5
+      - name: 登录 GHCR
+        uses: docker/login-action@v3
         with:
-          # 直接从国内 DaoCloud 拉取源镜像
-          context: https://docker.m.daocloud.io/ollama/ollama:latest
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/ollama:latest
-          # 利用 GitHub 自带的令牌登录（不需要你手动填账号密码）
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 同步 Open WebUI 镜像
-        uses: docker/build-push-action@v5
-        with:
-          context: https://docker.m.daocloud.io/ghcr.io/open-webui/open-webui:main
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/open-webui:latest
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: 拉取国内 Ollama
+        run: docker pull docker.m.daocloud.io/ollama/ollama:latest
+
+      - name: 打标签
+        run: docker tag docker.m.daocloud.io/ollama/ollama:latest ghcr.io/${{ github.repository_owner }}/ollama:latest
+
+      - name: 推送到私仓
+        run: docker push ghcr.io/${{ github.repository_owner }}/ollama:latest
+
+      - name: 拉取国内 Open WebUI
+        run: docker pull docker.m.daocloud.io/open-webui/open-webui:main
+
+      - name: 打标签
+        run: docker tag docker.m.daocloud.io/open-webui/open-webui:main ghcr.io/${{ github.repository_owner }}/open-webui:main
+
+      - name: 推送到私仓
+        run: docker push ghcr.io/${{ github.repository_owner }}/open-webui:main
